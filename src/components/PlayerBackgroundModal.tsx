@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   X,
   User,
@@ -23,16 +23,30 @@ interface PlayerBackgroundModalProps {
     secondary: string;
     accent?: string;
   };
+  initialFocus?: string;
 }
 
 export function PlayerBackgroundModal({
   player,
   onClose,
   teamColors,
+  initialFocus,
 }: PlayerBackgroundModalProps) {
+  const initialFocusRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (initialFocus && initialFocusRef.current) {
+      initialFocusRef.current.focus();
+    }
+  }, [initialFocus, initialFocusRef]);
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+      <div 
+        ref={initialFocusRef} 
+        tabIndex={initialFocus ? 0 : -1}
+        className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+      >
         {/* Header */}
         <div 
           className="p-6 relative"
@@ -325,7 +339,7 @@ export function PlayerBackgroundModal({
                                 }}
                               >
                                 <Star className="w-4 h-4" />
-                                {highlight}
+                                {String(highlight)}
                               </span>
                             ))}
                           </div>
@@ -335,20 +349,17 @@ export function PlayerBackgroundModal({
                       {/* Season Awards */}
                       {season.awards && season.awards.length > 0 && (
                         <div className="mt-4">
-                          <h5 className="text-sm font-semibold text-gray-700 mb-2">Season Awards</h5>
-                          <div className="flex flex-wrap gap-2">
-                            {season.awards.map((award, awardIndex) => (
-                              <span
-                                key={awardIndex}
-                                className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm"
-                                style={{
-                                  backgroundColor: `${teamColors.primary}15`,
-                                  color: teamColors.primary,
-                                }}
+                          <h5 className="text-sm font-semibold mb-2">Awards</h5>
+                          <div className="space-y-2">
+                            {season.awards.map((award, index) => (
+                              <div 
+                                key={index} 
+                                className="flex items-center gap-2"
+                                style={{ color: teamColors.primary }}
                               >
-                                <Award className="w-4 h-4" />
-                                {award}
-                              </span>
+                                <Trophy className="w-5 h-5" />
+                                {award.name}: {award.description}
+                              </div>
                             ))}
                           </div>
                         </div>

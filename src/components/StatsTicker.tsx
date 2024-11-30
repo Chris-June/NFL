@@ -1,36 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, Award, Users, Timer } from 'lucide-react';
+import { CurrentStats, TeamInfo } from '../types';
 
-const stats = [
-  {
-    icon: TrendingUp,
-    value: '15.8M',
-    label: 'Fantasy Players',
-    color: 'text-green-500',
-  },
-  {
-    icon: Award,
-    value: '57',
-    label: 'Super Bowls',
-    color: 'text-yellow-500',
-  },
-  {
-    icon: Users,
-    value: '32',
-    label: 'Teams',
-    color: 'text-blue-500',
-  },
-  {
-    icon: Timer,
-    value: 'Live',
-    label: 'Updates',
-    color: 'text-red-500',
-  },
-];
+interface StatsTickerProps {
+  currentStats: CurrentStats;
+  team: TeamInfo;
+}
 
-export function StatsTicker() {
+export function StatsTicker({ currentStats, team }: StatsTickerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const stats = [
+    {
+      icon: TrendingUp,
+      value: currentStats.winPercentage.toFixed(1) + '%',
+      label: 'Win Rate',
+      color: `text-[${team.colors.primary}]`,
+    },
+    {
+      icon: Award,
+      value: currentStats.conferenceRank.toString(),
+      label: 'Conference Rank',
+      color: `text-[${team.colors.secondary}]`,
+    },
+    {
+      icon: Users,
+      value: currentStats.pointsPerGame.toFixed(1),
+      label: 'Points/Game',
+      color: `text-[${team.colors.primary}]`,
+    },
+    {
+      icon: Timer,
+      value: currentStats.totalYardsPerGame.toFixed(1),
+      label: 'Yards/Game',
+      color: `text-[${team.colors.secondary}]`,
+    },
+  ];
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -38,10 +44,10 @@ export function StatsTicker() {
     }, 3000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [stats.length]);
 
   return (
-    <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-white/10 backdrop-blur-md rounded-full px-8 py-4">
+    <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-white/10 backdrop-blur-md rounded-full px-8 py-4 border-2" style={{ borderColor: team.colors.primary }}>
       <AnimatePresence mode="wait">
         <motion.div
           key={currentIndex}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TeamHero } from "../components/TeamHero";
 import { Header } from "../components/Header";
 import { StandingsCard } from "../components/StandingsCard";
@@ -23,12 +23,20 @@ import { conferenceChampionships } from "../data/Conference/NFC/East/Cowboys/con
 import { mascots } from "../data/mascots";
 
 export function CowboysPage() {
-  // State to manage the currently selected player, Super Bowl, or conference championship
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [selectedSuperBowl, setSelectedSuperBowl] = useState<SuperBowlGame | null>(null);
   const [selectedChampionship, setSelectedChampionship] = useState<ConferenceChampionship | null>(null);
 
-  // Handle game click from search bar
+  useEffect(() => {
+    const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    setIsDarkMode(darkModeQuery.matches);
+    
+    const handler = (e: MediaQueryListEvent) => setIsDarkMode(e.matches);
+    darkModeQuery.addEventListener('change', handler);
+    return () => darkModeQuery.removeEventListener('change', handler);
+  }, []);
+
   const handleGameClick = (game: SuperBowlGame | ConferenceChampionship) => {
     if ('mvp' in game) {
       setSelectedSuperBowl(game as SuperBowlGame);
@@ -42,10 +50,20 @@ export function CowboysPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className={`min-h-screen ${isDarkMode ? 'bg-[#0B1623] text-white' : 'bg-[#F5F7FA] text-[#1A1A1A]'}`}>
+      {/* Gradient overlay for dark mode */}
+      <div className={`fixed inset-0 pointer-events-none ${
+        isDarkMode ? 'bg-gradient-to-br from-[#003594]/20 to-transparent' : ''
+      }`} />
+
       <Header team={teamInfo} />
-      {/* Add margin-top to account for fixed header height */}
-      <div className="mt-16"> 
+
+      {/* Main content */}
+      <div className="relative mt-16">
+        <div className={`absolute inset-0 ${
+          isDarkMode ? 'bg-[url("/cowboys-pattern-dark.png")]' : 'bg-[url("/cowboys-pattern-light.png")]'
+        } opacity-5 pointer-events-none bg-repeat`} />
+
         <TeamHero 
           team={teamInfo}
           stats={{
@@ -56,25 +74,42 @@ export function CowboysPage() {
           mascots={mascots}
         />
         
-        <div className="flex-1 overflow-y-auto">
-          <main className="container mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Left Column */}
-              <div className="lg:col-span-2 space-y-8">
+        <main className="relative container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className={`p-6 rounded-xl shadow-lg ${
+                isDarkMode ? 'bg-[#1E293B] shadow-blue-900/20' : 'bg-white shadow-gray-200/50'
+              }`}>
                 <SearchBar 
                   onPlayerClick={handlePlayerSelect}
                   onGameClick={handleGameClick}
                   teamColors={teamInfo.colors}
                 />
+              </div>
+
+              <div className={`p-6 rounded-xl shadow-lg backdrop-blur-sm ${
+                isDarkMode ? 'bg-[#1E293B]/90 shadow-blue-900/20' : 'bg-white/90 shadow-gray-200/50'
+              }`}>
                 <PlayerRoster 
                   roster={currentRoster}
                   onPlayerSelect={handlePlayerSelect}
                 />
+              </div>
+
+              <div className={`p-6 rounded-xl shadow-lg backdrop-blur-sm ${
+                isDarkMode ? 'bg-[#1E293B]/90 shadow-blue-900/20' : 'bg-white/90 shadow-gray-200/50'
+              }`}>
                 <HallOfFame 
                   team={teamInfo}
                   achievements={achievements}
                   onPlayerSelect={handlePlayerSelect}
                 />
+              </div>
+
+              <div className={`p-6 rounded-xl shadow-lg backdrop-blur-sm ${
+                isDarkMode ? 'bg-[#1E293B]/90 shadow-blue-900/20' : 'bg-white/90 shadow-gray-200/50'
+              }`}>
                 <TeamHistory 
                   team={teamInfo}
                   superBowls={superBowlDetails}
@@ -84,9 +119,13 @@ export function CowboysPage() {
                   onConferenceSelect={setSelectedChampionship}
                 />
               </div>
-              
-              {/* Right Column */}
-              <div className="space-y-8">
+            </div>
+            
+            {/* Right Column */}
+            <div className="space-y-6">
+              <div className={`p-6 rounded-xl shadow-lg backdrop-blur-sm ${
+                isDarkMode ? 'bg-[#1E293B]/90 shadow-blue-900/20' : 'bg-white/90 shadow-gray-200/50'
+              }`}>
                 <StandingsCard 
                   currentStats={historicalStats}
                   allTimeStats={{
@@ -95,11 +134,16 @@ export function CowboysPage() {
                     defense: allTimeStats.defense
                   }}
                 />
+              </div>
+
+              <div className={`sticky top-24 p-6 rounded-xl shadow-lg backdrop-blur-sm ${
+                isDarkMode ? 'bg-[#1E293B]/90 shadow-blue-900/20' : 'bg-white/90 shadow-gray-200/50'
+              }`}>
                 <ChatWidget teamId="DAL" />
               </div>
             </div>
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
 
       {/* Modals */}
@@ -107,23 +151,18 @@ export function CowboysPage() {
         <PlayerBackgroundModal
           player={selectedPlayer}
           onClose={() => setSelectedPlayer(null)}
-          teamColors={teamInfo.colors}
         />
       )}
-      
       {selectedSuperBowl && (
         <SuperBowlModal
           game={selectedSuperBowl}
           onClose={() => setSelectedSuperBowl(null)}
-          teamColors={teamInfo.colors}
         />
       )}
-      
       {selectedChampionship && (
         <ConferenceChampionshipModal
           championship={selectedChampionship}
           onClose={() => setSelectedChampionship(null)}
-          teamColors={teamInfo.colors}
         />
       )}
     </div>

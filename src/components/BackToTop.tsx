@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
-export const BackToTop: React.FC = () => {
+interface BackToTopProps {
+  teamColors?: {
+    primary: string;
+    secondary: string;
+  };
+}
+
+export const BackToTop: React.FC<BackToTopProps> = ({ teamColors }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -29,7 +36,11 @@ export const BackToTop: React.FC = () => {
   return isVisible ? (
     <button
       onClick={scrollToTop}
-      className="fixed bottom-4 right-4 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 z-50"
+      className={`fixed bottom-4 right-4 hover:bg-opacity-90 text-white p-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-opacity-50 z-50`}
+      style={{
+        backgroundColor: teamColors?.primary || 'bg-blue-600',
+        color: teamColors?.secondary || 'text-white'
+      }}
       aria-label="Back to top"
     >
       <svg

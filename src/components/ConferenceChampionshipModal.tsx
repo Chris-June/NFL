@@ -1,4 +1,4 @@
-import React from "react";
+import { useRef, useEffect } from "react";
 import {
 	X,
 	Trophy,
@@ -19,22 +19,37 @@ interface ConferenceChampionshipModalProps {
 		primary: string; // Primary team color for styling
 		secondary: string; // Secondary team color for styling
 	};
+	initialFocus?: string; // Added optional initialFocus prop
 }
 
 export function ConferenceChampionshipModal({
 	championship,
 	onClose,
 	teamColors,
+	initialFocus,
 }: ConferenceChampionshipModalProps) {
+	const initialFocusRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (initialFocusRef.current && initialFocus) {
+			initialFocusRef.current.focus();
+		}
+	}, [initialFocus]);
+
 	return (
 		<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-			<div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+			<div
+				ref={initialFocusRef}
+				tabIndex={-1}
+				className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+			>
 				{/* Header */}
 				<div
 					className="p-6 sticky top-0 z-10"
 					style={{
 						background: `linear-gradient(135deg, ${teamColors.primary}, ${teamColors.secondary})`, // Dynamic gradient background using team colors
-					}}>
+					}}
+				>
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-3">
 							<Trophy className="w-8 h-8 text-white" />
@@ -50,7 +65,8 @@ export function ConferenceChampionshipModal({
 						</div>
 						<button
 							onClick={onClose} // Close the modal when clicked
-							className="text-white/80 hover:text-white transition-colors">
+							className="text-white/80 hover:text-white transition-colors"
+						>
 							<X className="w-6 h-6" />
 						</button>
 					</div>
@@ -181,7 +197,8 @@ export function ConferenceChampionshipModal({
 							{championship.gameHighlights.map((highlight, index) => (
 								<div
 									key={index}
-									className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+									className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg"
+								>
 									{/* Icon representing the quarter */}
 									<div className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-200">
 										<Clock className="w-6 h-6 text-gray-600" />

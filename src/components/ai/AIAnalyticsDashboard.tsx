@@ -5,17 +5,33 @@ import { PlayPredictionCard } from './PlayPredictionCard';
 import { FanEngagementCard } from './FanEngagementCard';
 import { TacticalAnalysisCard } from './TacticalAnalysisCard';
 import { useGameAI } from '../../hooks/useGameAI';
+import { CurrentStats, HistoricalStats } from '../../types';
+
+const TAB_IDS = {
+  PREDICTIONS: 'predictions',
+  ENGAGEMENT: 'engagement',
+  TACTICAL: 'tactical',
+  STATS: 'stats'
+} as const;
+
+type TabId = typeof TAB_IDS[keyof typeof TAB_IDS];
 
 interface AIAnalyticsDashboardProps {
-  gameId: string;
+  teamId: string;
+  gameId?: string;
+  currentStats?: CurrentStats;
+  historicalStats?: HistoricalStats;
   className?: string;
 }
 
 export const AIAnalyticsDashboard: React.FC<AIAnalyticsDashboardProps> = ({
+  teamId,
   gameId,
+  currentStats,
+  historicalStats,
   className = ''
 }) => {
-  const [activeTab, setActiveTab] = useState<'predictions' | 'engagement' | 'tactical'>('predictions');
+  const [activeTab, setActiveTab] = useState<TabId>('predictions');
   const { 
     gamePrediction,
     playPrediction,
@@ -23,13 +39,14 @@ export const AIAnalyticsDashboard: React.FC<AIAnalyticsDashboardProps> = ({
     tacticalAnalysis,
     isLoading,
     error
-  } = useGameAI(gameId);
+  } = useGameAI(gameId || teamId);
 
   const tabs = [
-    { id: 'predictions', label: 'Predictions', icon: '🎯' },
-    { id: 'engagement', label: 'Fan Engagement', icon: '👥' },
-    { id: 'tactical', label: 'Tactical Analysis', icon: '📊' }
-  ] as const;
+    { id: TAB_IDS.PREDICTIONS, label: 'Predictions', icon: '🎯' },
+    { id: TAB_IDS.ENGAGEMENT, label: 'Fan Engagement', icon: '👥' },
+    { id: TAB_IDS.TACTICAL, label: 'Tactical Analysis', icon: '📊' },
+    ...(currentStats || historicalStats ? [{ id: TAB_IDS.STATS, label: 'Team Stats', icon: '📈' }] : [])
+  ];
 
   if (error) {
     return (
@@ -42,7 +59,7 @@ export const AIAnalyticsDashboard: React.FC<AIAnalyticsDashboardProps> = ({
   return (
     <div className={`bg-gray-50 p-6 rounded-xl ${className}`}>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">AI Game Analytics</h2>
+        <h2 className="text-2xl font-bold">AI Team Analytics</h2>
         <div className="flex space-x-2">
           {tabs.map(tab => (
             <button
@@ -73,7 +90,7 @@ export const AIAnalyticsDashboard: React.FC<AIAnalyticsDashboardProps> = ({
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.2 }}
         >
-          {activeTab === 'predictions' && (
+          {activeTab === TAB_IDS.PREDICTIONS && (
             <div className="space-y-6">
               {gamePrediction && (
                 <GamePredictionCard prediction={gamePrediction} />
@@ -84,12 +101,31 @@ export const AIAnalyticsDashboard: React.FC<AIAnalyticsDashboardProps> = ({
             </div>
           )}
 
-          {activeTab === 'engagement' && fanEngagement && (
+          {activeTab === TAB_IDS.ENGAGEMENT && fanEngagement && (
             <FanEngagementCard engagement={fanEngagement} />
           )}
 
-          {activeTab === 'tactical' && tacticalAnalysis && (
+          {activeTab === TAB_IDS.TACTICAL && tacticalAnalysis && (
             <TacticalAnalysisCard analysis={tacticalAnalysis} />
+          )}
+
+          {activeTab === TAB_IDS.STATS && (
+            <div className="space-y-4">
+              {currentStats && (
+                <div className="bg-white p-4 rounded-lg shadow">
+                  <h3 className="text-lg font-semibold mb-3">Current Season Stats</h3>
+                  {/* Add a component or render current stats details */}
+                  <pre>{JSON.stringify(currentStats, null, 2)}</pre>
+                </div>
+              )}
+              {historicalStats && (
+                <div className="bg-white p-4 rounded-lg shadow">
+                  <h3 className="text-lg font-semibold mb-3">Historical Stats</h3>
+                  {/* Add a component or render historical stats details */}
+                  <pre>{JSON.stringify(historicalStats, null, 2)}</pre>
+                </div>
+              )}
+            </div>
           )}
         </motion.div>
       )}

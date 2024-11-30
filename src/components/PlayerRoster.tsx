@@ -5,9 +5,10 @@ import { Player } from "../types";
 interface PlayerRosterProps {
   roster: Player[];
   onPlayerSelect: (player: Player) => void;
+  style?: React.CSSProperties;
 }
 
-export function PlayerRoster({ roster, onPlayerSelect }: PlayerRosterProps) {
+export function PlayerRoster({ roster, onPlayerSelect, style }: PlayerRosterProps) {
   // State to control autoplay functionality
   const [isAutoPlay, setIsAutoPlay] = useState(true);
   // State to track the current slide index
@@ -36,6 +37,15 @@ export function PlayerRoster({ roster, onPlayerSelect }: PlayerRosterProps) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Handle next slide
+  const handleNext = useCallback(() => {
+    if (!isTransitioning) {
+      setIsTransitioning(true);
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % Math.ceil(roster.length / cardsPerView));
+      setTimeout(() => setIsTransitioning(false), 500);
+    }
+  }, [cardsPerView, isTransitioning, roster.length]);
+
   // Handle autoplay functionality
   useEffect(() => {
     if (isAutoPlay && !isTransitioning) {
@@ -48,16 +58,7 @@ export function PlayerRoster({ roster, onPlayerSelect }: PlayerRosterProps) {
         clearInterval(autoPlayRef.current);
       }
     };
-  }, [isAutoPlay, isTransitioning]);
-
-  // Handle next slide
-  const handleNext = useCallback(() => {
-    if (!isTransitioning) {
-      setIsTransitioning(true);
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % Math.ceil(roster.length / cardsPerView));
-      setTimeout(() => setIsTransitioning(false), 500);
-    }
-  }, [cardsPerView, isTransitioning, roster.length]);
+  }, [isAutoPlay, isTransitioning, handleNext]);
 
   // Handle previous slide
   const handlePrev = useCallback(() => {
@@ -77,7 +78,7 @@ export function PlayerRoster({ roster, onPlayerSelect }: PlayerRosterProps) {
   );
 
   return (
-    <div className="bg-white shadow rounded-lg p-6">
+    <div className="bg-white shadow rounded-lg p-6" style={style}>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-2">
           <Users className="w-6 h-6 text-blue-500" />
@@ -127,6 +128,7 @@ export function PlayerRoster({ roster, onPlayerSelect }: PlayerRosterProps) {
               key={player.id}
               className={`w-full min-w-[${100 / cardsPerView}%] px-2`}
               onClick={() => onPlayerSelect(player)}
+              style={{ zIndex: visiblePlayers.length - index }}
             >
               <div className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
                 <h3 className="text-lg font-semibold">{player.name}</h3>

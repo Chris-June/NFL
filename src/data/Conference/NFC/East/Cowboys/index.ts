@@ -3,6 +3,7 @@ import { TeamInfo } from "../../../../../types";
 export const cowboysData: TeamInfo = {
   id: "cowboys",
   name: "Dallas Cowboys",
+  abbreviation: "DAL",
   city: "Dallas",
   conference: "NFC",
   division: "East",

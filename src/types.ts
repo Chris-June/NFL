@@ -82,10 +82,17 @@ export interface Player {
     stats: {
       [key: string]: number | string;
     };
-    highlights?: string[];
-    awards?: string[];
+    highlights?: Array<{
+      quarter: string;
+      description: string;
+    }>;
+    awards?: Array<{
+      name: string;
+      description: string;
+    }>;
   }>;
   isCurrentRoster?: boolean;
+  experience?: number;
 }
 
 // Team type definition
@@ -101,6 +108,8 @@ export interface Team {
   };
   mascot: string;
   stadium: string;
+  imageUrl: string;
+  location: string;  // City, State format
 }
 
 // Super Bowl Game type definition
@@ -110,12 +119,23 @@ export interface SuperBowlGame {
   opponent: string;
   score: string;
   venue: string;
-  mvp: string;
+  mvp: {
+    name: string;
+    stats: string;
+  };
   attendance: number;
   gameStats: {
     [key: string]: string | number;
   };
-  highlights: string[];
+  highlights: Array<{
+    quarter: string;
+    description: string;
+  }>;
+  keyPlayers?: Array<{
+    name: string;
+    position: string;
+    stats: string;
+  }>;
 }
 
 // Team Mascot type definition
@@ -170,6 +190,15 @@ export interface TeamStats {
   }>;
 }
 
+// Historical Stats type definition
+export interface HistoricalStats {
+  rushing: Array<{ year: string; value: number; rank: number }>;
+  passing: Array<{ year: string; value: number; rank: number }>;
+  scoring: Array<{ year: string; value: number; rank: number }>;
+  defense: Array<{ year: string; value: number; rank: number }>;
+  turnover: Array<{ year: string; value: number; rank: number }>;
+}
+
 // CurrentStats type definition
 export interface CurrentStats {
   rushing: Array<{
@@ -197,6 +226,10 @@ export interface CurrentStats {
     value: number;
     rank: number;
   }>;
+  winPercentage: number;
+  conferenceRank: number;
+  pointsPerGame: number;
+  totalYardsPerGame: number;
 }
 
 // Component Props Interfaces
@@ -254,13 +287,7 @@ export interface TeamHistoryProps {
   team: TeamInfo;
   superBowls: SuperBowlGame[];
   conferenceChampionships: ConferenceChampionship[];
-  historicalStats: {
-    rushing: Array<{ year: string; value: number; rank: number }>;
-    passing: Array<{ year: string; value: number; rank: number }>;
-    scoring: Array<{ year: string; value: number; rank: number }>;
-    defense: Array<{ year: string; value: number; rank: number }>;
-    turnover: Array<{ year: string; value: number; rank: number }>;
-  };
+  historicalStats: HistoricalStats;
   onSuperBowlSelect: (game: SuperBowlGame) => void;
   onChampionshipSelect: (championship: ConferenceChampionship) => void;
 }

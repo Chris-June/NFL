@@ -1,15 +1,19 @@
-import React from 'react';
 import { Github, Twitter, Linkedin, Mail } from 'lucide-react';
+import { TeamInfo } from '../types';
 
-export function Footer() {
+interface FooterProps {
+  team: TeamInfo;
+}
+
+export function Footer({ team }: FooterProps) {
   return (
     <footer className="bg-[#013369] text-white py-12">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">NFL Teams Hub</h3>
+            <h3 className="text-xl font-bold mb-4">{team.name} Team Hub</h3>
             <p className="text-gray-300">
-              Your comprehensive source for NFL team statistics and information
+              Comprehensive source for {team.name} NFL team statistics and information
             </p>
           </div>
           <div>
@@ -50,7 +54,7 @@ export function Footer() {
         </div>
         
         <div className="border-t border-gray-700 pt-8 text-center text-gray-300">
-          <p>© 2024 Intellisync Solutions. All rights reserved.</p>
+          <p> 2024 Intellisync Solutions. All rights reserved.</p>
           <p className="text-sm mt-2">
             NFL and team marks are trademarks of their respective owners.
           </p>
