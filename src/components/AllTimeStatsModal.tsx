@@ -1,7 +1,7 @@
 import React from "react";
 import { X, Trophy, Zap, Shield, Award, Users, Calendar } from "lucide-react";
 import { TeamInfo } from "../types"; // NOTE: The TeamInfo type is currently not being used, and needs to be implemented properly.
-import { allTimeStats } from "../data/allTimeStats"; // NOTE: This data import is being used in the content.
+import { allTimeStats } from "../data/Conference/NFC/East/Cowboys/allTimeStats"; // NOTE: This data import is being used in the content.
 
 interface AllTimeStatsModalProps {
 	isOpen: boolean; // Prop to check if the modal is open

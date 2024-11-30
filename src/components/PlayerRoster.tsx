@@ -1,163 +1,164 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Users, ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
-import { TeamInfo } from "../types";
-import { PlayerCard } from "./PlayerCard";
-import { currentRoster } from "../data/currentRoster";
+import { Player } from "../types";
 
 interface PlayerRosterProps {
-	team: TeamInfo;
+  roster: Player[];
+  onPlayerSelect: (player: Player) => void;
 }
 
-export function PlayerRoster({ team }: PlayerRosterProps) {
-	// State to control autoplay functionality
-	const [isAutoPlay, setIsAutoPlay] = useState(true);
-	// State to track the current slide index
-	const [currentIndex, setCurrentIndex] = useState(0);
-	// State to track if a slide transition is ongoing
-	const [isTransitioning, setIsTransitioning] = useState(false);
-	// State to determine how many cards are visible per view based on screen size
-	const [cardsPerView, setCardsPerView] = useState(3);
-	// Ref to hold the interval ID for autoplay
-	const autoPlayRef = useRef<NodeJS.Timeout>();
+export function PlayerRoster({ roster, onPlayerSelect }: PlayerRosterProps) {
+  // State to control autoplay functionality
+  const [isAutoPlay, setIsAutoPlay] = useState(true);
+  // State to track the current slide index
+  const [currentIndex, setCurrentIndex] = useState(0);
+  // State to track if a slide transition is ongoing
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  // State to determine how many cards are visible per view based on screen size
+  const [cardsPerView, setCardsPerView] = useState(3);
+  // Ref to hold the interval ID for autoplay
+  const autoPlayRef = useRef<NodeJS.Timeout>();
 
-	// Effect to update the number of cards per view based on screen size
-	useEffect(() => {
-		const updateCardsPerView = () => {
-			if (window.innerWidth >= 1024) {
-				setCardsPerView(3);
-			} else if (window.innerWidth >= 768) {
-				setCardsPerView(2);
-			} else {
-				setCardsPerView(1);
-			}
-		};
+  // Update cardsPerView based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        setCardsPerView(1);
+      } else if (window.innerWidth < 1024) {
+        setCardsPerView(2);
+      } else {
+        setCardsPerView(3);
+      }
+    };
 
-		updateCardsPerView();
-		window.addEventListener("resize", updateCardsPerView);
-		return () => window.removeEventListener("resize", updateCardsPerView);
-	}, []);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-	// Calculate the total number of slides based on the roster length and cards per view
-	const totalSlides = Math.ceil(currentRoster.length / cardsPerView);
+  // Handle autoplay functionality
+  useEffect(() => {
+    if (isAutoPlay && !isTransitioning) {
+      autoPlayRef.current = setInterval(() => {
+        handleNext();
+      }, 3000);
+    }
+    return () => {
+      if (autoPlayRef.current) {
+        clearInterval(autoPlayRef.current);
+      }
+    };
+  }, [isAutoPlay, isTransitioning]);
 
-	// Function to handle moving to the next slide, wrapped in useCallback to prevent unnecessary re-creations
-	const handleNext = useCallback(() => {
-		if (isTransitioning) return;
-		setIsTransitioning(true);
-		setCurrentIndex((prev) => (prev + 1) % totalSlides);
-		setTimeout(() => setIsTransitioning(false), 500); // Delay to manage transition state
-	}, [isTransitioning, totalSlides]);
+  // Handle next slide
+  const handleNext = useCallback(() => {
+    if (!isTransitioning) {
+      setIsTransitioning(true);
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % Math.ceil(roster.length / cardsPerView));
+      setTimeout(() => setIsTransitioning(false), 500);
+    }
+  }, [cardsPerView, isTransitioning, roster.length]);
 
-	// Function to handle moving to the previous slide
-	const handlePrev = () => {
-		if (isTransitioning) return;
-		setIsTransitioning(true);
-		setCurrentIndex((prev) => (prev - 1 + totalSlides) % totalSlides);
-		setTimeout(() => setIsTransitioning(false), 500); // Delay to manage transition state
-	};
+  // Handle previous slide
+  const handlePrev = useCallback(() => {
+    if (!isTransitioning) {
+      setIsTransitioning(true);
+      setCurrentIndex((prevIndex) =>
+        prevIndex === 0 ? Math.ceil(roster.length / cardsPerView) - 1 : prevIndex - 1
+      );
+      setTimeout(() => setIsTransitioning(false), 500);
+    }
+  }, [cardsPerView, isTransitioning, roster.length]);
 
-	// Function to toggle autoplay on and off
-	const toggleAutoPlay = () => {
-		setIsAutoPlay(!isAutoPlay);
-	};
+  // Calculate visible players based on current index and cards per view
+  const visiblePlayers = roster.slice(
+    currentIndex * cardsPerView,
+    (currentIndex + 1) * cardsPerView
+  );
 
-	// Effect to manage autoplay functionality
-	useEffect(() => {
-		if (isAutoPlay) {
-			autoPlayRef.current = setInterval(() => {
-				handleNext();
-			}, 5000); // Move to the next slide every 5 seconds
-		}
-		return () => {
-			if (autoPlayRef.current) {
-				clearInterval(autoPlayRef.current);
-			}
-		};
-	}, [isAutoPlay, handleNext]);
+  return (
+    <div className="bg-white shadow rounded-lg p-6">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center space-x-2">
+          <Users className="w-6 h-6 text-blue-500" />
+          <h2 className="text-2xl font-bold text-gray-800">Player Roster</h2>
+        </div>
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => setIsAutoPlay(!isAutoPlay)}
+            className="p-2 rounded-full hover:bg-gray-100"
+          >
+            {isAutoPlay ? (
+              <Pause className="w-5 h-5 text-gray-600" />
+            ) : (
+              <Play className="w-5 h-5 text-gray-600" />
+            )}
+          </button>
+          <div className="flex space-x-2">
+            <button
+              onClick={handlePrev}
+              className="p-2 rounded-full hover:bg-gray-100"
+              disabled={isTransitioning}
+            >
+              <ChevronLeft className="w-5 h-5 text-gray-600" />
+            </button>
+            <button
+              onClick={handleNext}
+              className="p-2 rounded-full hover:bg-gray-100"
+              disabled={isTransitioning}
+            >
+              <ChevronRight className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
+        </div>
+      </div>
 
-	// Function to get the players currently visible based on the current index and cards per view
-	const getVisiblePlayers = () => {
-		const startIdx = currentIndex * cardsPerView;
-		return currentRoster.slice(startIdx, startIdx + cardsPerView);
-	};
+      <div className="relative overflow-hidden">
+        <div
+          className={`flex transition-transform duration-500 ease-in-out ${
+            isTransitioning ? "opacity-50" : ""
+          }`}
+          style={{
+            transform: `translateX(-${currentIndex * (100 / cardsPerView)}%)`,
+          }}
+        >
+          {visiblePlayers.map((player, index) => (
+            <div
+              key={player.id}
+              className={`w-full min-w-[${100 / cardsPerView}%] px-2`}
+              onClick={() => onPlayerSelect(player)}
+            >
+              <div className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
+                <h3 className="text-lg font-semibold">{player.name}</h3>
+                <p className="text-gray-600">{player.position} #{player.number}</p>
+                <div className="mt-2 text-sm text-gray-500">
+                  <p>{player.height} | {player.weight} lbs</p>
+                  <p>Experience: {player.experience}</p>
+                  <p>College: {player.college}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
-	return (
-		<div className="bg-white rounded-xl shadow-lg p-6">
-			{/* Header section with team icon and autoplay controls */}
-			<div className="flex items-center justify-between mb-6">
-				<div className="flex items-center gap-3">
-					<Users className="w-6 h-6 text-blue-600" />
-					<h2 className="text-2xl font-bold">Current Roster</h2>
-				</div>
-
-				<div className="flex items-center gap-4">
-					<button
-						onClick={toggleAutoPlay}
-						className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-						aria-label={isAutoPlay ? "Pause autoplay" : "Start autoplay"}>
-						{isAutoPlay ? (
-							<Pause className="w-5 h-5 text-gray-600" />
-						) : (
-							<Play className="w-5 h-5 text-gray-600" />
-						)}
-					</button>
-
-					<div className="flex items-center gap-2">
-						<button
-							onClick={handlePrev}
-							className="p-2 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50"
-							aria-label="Previous players"
-							disabled={isTransitioning} // Disable button during transition
-						>
-							<ChevronLeft className="w-6 h-6 text-gray-600" />
-						</button>
-						<button
-							onClick={handleNext}
-							className="p-2 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50"
-							aria-label="Next players"
-							disabled={isTransitioning} // Disable button during transition
-						>
-							<ChevronRight className="w-6 h-6 text-gray-600" />
-						</button>
-					</div>
-				</div>
-			</div>
-
-			{/* Player cards display section */}
-			<div className="relative overflow-hidden">
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-					{getVisiblePlayers().map((player) => (
-						<div
-							key={player.id}
-							className={`transition-all duration-500 ${
-								isTransitioning ? "opacity-50" : "opacity-100"
-							}`}>
-							<PlayerCard player={player} teamColors={team.colors} />
-						</div>
-					))}
-				</div>
-
-				{/* Progress Indicators */}
-				<div className="flex justify-center mt-6 gap-2">
-					{Array.from({ length: totalSlides }).map((_, index) => (
-						<button
-							key={index}
-							onClick={() => {
-								if (!isTransitioning) {
-									setIsTransitioning(true);
-									setCurrentIndex(index);
-									setTimeout(() => setIsTransitioning(false), 500);
-								}
-							}}
-							className={`w-2 h-2 rounded-full transition-colors ${
-								index === currentIndex ? "bg-blue-600" : "bg-gray-300"
-							}`}
-							aria-label={`Go to slide ${index + 1}`}
-							disabled={isTransitioning} // Disable button during transition
-						/>
-					))}
-				</div>
-			</div>
-		</div>
-	);
+      <div className="mt-4 flex justify-center">
+        {Array.from({ length: Math.ceil(roster.length / cardsPerView) }).map((_, index) => (
+          <button
+            key={index}
+            className={`w-2 h-2 mx-1 rounded-full ${
+              currentIndex === index ? "bg-blue-500" : "bg-gray-300"
+            }`}
+            onClick={() => {
+              if (!isTransitioning) {
+                setIsTransitioning(true);
+                setCurrentIndex(index);
+                setTimeout(() => setIsTransitioning(false), 500);
+              }
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
 }

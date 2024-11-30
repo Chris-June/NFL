@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Search, X, User, Trophy, History, Calendar } from "lucide-react";
 import { Player } from "../types";
-import { currentRoster } from "../data/currentRoster";
-import { achievements } from "../data/achievements";
-import { superBowlDetails } from "../data/superBowlDetails";
-import { conferenceChampionships } from "../data/conferenceChampionships";
+import { currentRoster } from "../data/Conference/NFC/East/Cowboys/currentRoster";
+import { achievements } from "../data/Conference/NFC/East/Cowboys/achievements";
+import { superBowlDetails } from "../data/Conference/NFC/East/Cowboys/superBowlDetails";
+import { conferenceChampionships } from "../data/Conference/NFC/East/Cowboys/conferenceChampionships";
 
 interface SearchResult {
 	type: "player" | "achievement" | "game";
@@ -162,22 +162,21 @@ export function SearchBar({
 	};
 
 	return (
-		<div ref={searchRef} className="relative z-50">
+		<div ref={searchRef} className="relative w-full">
 			<div className="relative">
 				{/* Search Input */}
 				<input
 					type="text"
-					placeholder="Search players, achievements, games..."
 					value={query}
 					onChange={(e) => {
 						setQuery(e.target.value);
 						search(e.target.value);
 						setIsOpen(true);
 					}}
-					onFocus={() => setIsOpen(true)}
-					className="w-full px-4 py-2 pl-10 pr-4 text-gray-900 placeholder-gray-500 bg-white border rounded-lg focus:outline-none focus:ring-2"
+					placeholder="Search players, achievements, and games..."
+					className="w-full pl-10 pr-10 py-2 rounded-lg border focus:outline-none focus:ring-2 transition-shadow"
 					style={{
-						borderColor: teamColors.primary,
+						borderColor: `${teamColors.primary}20`,
 						boxShadow: isOpen ? `0 0 0 2px ${teamColors.primary}20` : "none",
 					}}
 				/>
@@ -196,7 +195,7 @@ export function SearchBar({
 
 			{/* Search Results Dropdown */}
 			{isOpen && results.length > 0 && (
-				<div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border max-h-96 overflow-y-auto">
+				<div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border max-h-96 overflow-y-auto z-30">
 					{results.map((result, index) => (
 						<button
 							key={index}

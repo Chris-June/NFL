@@ -1,4 +1,4 @@
-import { TeamInfo } from '../types';
+import { TeamInfo } from '../types.js';
 
 export const nflTeams: Record<string, Record<string, TeamInfo[]>> = {
   AFC: {

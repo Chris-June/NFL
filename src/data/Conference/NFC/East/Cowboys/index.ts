@@ -1,28 +1,28 @@
-import { TeamInfo } from '../types';
+import { TeamInfo } from "../../../../../types";
 
 export const cowboysData: TeamInfo = {
-  id: 'cowboys',
-  name: 'Cowboys',
-  city: 'Dallas',
-  conference: 'NFC',
-  division: 'East',
+  id: "cowboys",
+  name: "Dallas Cowboys",
+  city: "Dallas",
+  conference: "NFC",
+  division: "East",
   colors: {
-    primary: '#041E42',
-    secondary: '#869397',
-    accent: '#ffffff'
+    primary: "#003594",
+    secondary: "#869397",
+    accent: "#ffffff"
   },
   stats: {
-    wins: 12,
-    losses: 5,
+    wins: 10,
+    losses: 4,
     ties: 0,
-    winPercentage: 0.706,
+    winPercentage: 0.714,
     pointsFor: 509,
     pointsAgainst: 315,
     offense: {
-      totalYards: 5789,
+      totalYards: 5523,
       yardsPerGame: 361.8,
-      passingYards: 4516,
-      rushingYards: 1273,
+      passingYards: 3678,
+      rushingYards: 1845,
       turnovers: 18,
       rankings: {
         overall: 5,
@@ -63,9 +63,9 @@ export const cowboysData: TeamInfo = {
           "NFL Hall of Fame (1985)"
         ],
         stats: {
-          "Pass Yards": "22,700",
+          "Pass Yards": "22700",
           "Touchdowns": "153",
-          "Completions": "1,685",
+          "Completions": "1685",
           "QB Rating": "83.4"
         }
       }
@@ -109,9 +109,9 @@ export const cowboysData: TeamInfo = {
           "NFL Hall of Fame (2006)"
         ],
         stats: {
-          "Pass Yards": "32,942",
+          "Pass Yards": "32942",
           "Touchdowns": "165",
-          "Completions": "2,898",
+          "Completions": "2898",
           "QB Rating": "81.6"
         }
       }
@@ -132,9 +132,9 @@ export const cowboysData: TeamInfo = {
           "NFL Hall of Fame (2010)"
         ],
         stats: {
-          "Rush Yards": "18,355",
+          "Rush Yards": "18355",
           "Touchdowns": "164",
-          "Rush Attempts": "4,409",
+          "Rush Attempts": "4409",
           "Yards Per Carry": "4.2"
         }
       }
@@ -155,7 +155,7 @@ export const cowboysData: TeamInfo = {
         ],
         stats: {
           "Receptions": "750",
-          "Receiving Yards": "11,904",
+          "Receiving Yards": "11904",
           "Touchdowns": "65",
           "Yards Per Catch": "15.9"
         }
@@ -200,10 +200,10 @@ export const cowboysData: TeamInfo = {
           "NFL Hall of Fame (1994)"
         ],
         stats: {
-          "Rush Yards": "12,739",
+          "Rush Yards": "12739",
           "Touchdowns": "91",
           "Receptions": "398",
-          "All-Purpose Yards": "16,326"
+          "All-Purpose Yards": "16326"
         }
       }
     },
@@ -316,7 +316,7 @@ export const cowboysData: TeamInfo = {
         ],
         stats: {
           "Receptions": "422",
-          "Receiving Yards": "4,630",
+          "Receiving Yards": "4630",
           "Touchdowns": "30",
           "Pro Bowls": "5"
         }
