@@ -1,6 +1,6 @@
-import React from "react";
 import { X, Trophy, User, Star, Clock, MapPin, Users } from "lucide-react";
-import { SuperBowlGame } from "../types"; // The 'SuperBowlGame' import is currently unused. This indicates that the related type may be intended for future development or the component is incomplete. Consider adding a TODO comment or removing it if it won't be needed.
+import { SuperBowlGame } from "../types";
+import { useRef, useEffect } from "react";
 
 interface SuperBowlModalProps {
 	game: SuperBowlGame;
@@ -9,15 +9,28 @@ interface SuperBowlModalProps {
 		primary: string;
 		secondary: string;
 	};
+	initialFocus?: string;
 }
 
 export function SuperBowlModal({
 	game,
 	onClose,
 	teamColors,
+	initialFocus,
 }: SuperBowlModalProps) {
+	const modalRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (initialFocus && modalRef.current) {
+			const focusElement = modalRef.current.querySelector(`[data-focus="${initialFocus}"]`) as HTMLElement;
+			if (focusElement) {
+				focusElement.focus();
+			}
+		}
+	}, [initialFocus]);
+
 	return (
-		<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+		<div ref={modalRef} className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
 			<div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
 				{/* Header section with gradient background color based on team colors */}
 				<div
@@ -37,6 +50,7 @@ export function SuperBowlModal({
 						</div>
 						{/* Close button to close the modal */}
 						<button
+							data-focus="close-modal"
 							onClick={onClose}
 							className="text-white/80 hover:text-white transition-colors">
 							<X className="w-6 h-6" />
@@ -93,7 +107,7 @@ export function SuperBowlModal({
 					<div>
 						<h3 className="text-xl font-bold mb-4">Key Players</h3>
 						<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-							{game.keyPlayers.map(
+							{game.keyPlayers?.map(
 								(
 									player: { name: string; position: string; stats: string },
 									index: number
@@ -104,7 +118,7 @@ export function SuperBowlModal({
 										<p className="text-sm mt-2">{player.stats}</p>
 									</div>
 								)
-							)}
+							) ?? []}
 						</div>
 					</div>
 
@@ -112,27 +126,22 @@ export function SuperBowlModal({
 					<div>
 						<h3 className="text-xl font-bold mb-4">Game Highlights</h3>
 						<div className="space-y-4">
-							{game.highlights.map(
-								(
-									highlight: { quarter: string; description: string },
-									index: number
-								) => (
-									<div
-										key={index}
-										className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-										{/* Icon for each highlight */}
-										<div className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-200">
-											<Clock className="w-6 h-6 text-gray-600" />
-										</div>
-										<div>
-											<p className="font-semibold">
-												{highlight.quarter} Quarter
-											</p>
-											<p className="text-gray-600">{highlight.description}</p>
-										</div>
+							{game.highlights.map((highlight, index) => (
+								<div
+									key={index}
+									className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+									{/* Icon for each highlight */}
+									<div className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-200">
+										<Clock className="w-6 h-6 text-gray-600" />
 									</div>
-								)
-							)}
+									<div>
+										<p className="font-semibold">
+											{highlight.quarter} Quarter
+										</p>
+										<p className="text-gray-600">{highlight.description}</p>
+									</div>
+								</div>
+							))}
 						</div>
 					</div>
 				</div>
